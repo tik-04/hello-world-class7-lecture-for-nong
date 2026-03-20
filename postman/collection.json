@@ -1,0 +1,1283 @@
+{
+  "info": {
+    "_postman_id": "class7-collection",
+    "name": "Class7 Student Registration API",
+    "description": "Complete CRUD API for Student Registration System (Express.js + PostgreSQL)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "GET /students",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Response has message and data\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "  pm.expect(res).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "pm.test(\"Data is array\", function () {",
+                  "  pm.expect(res.data).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /students/:id (success)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students",
+                "{{studentId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Data has required student fields\", function () {",
+                  "  pm.expect(res.data).to.have.property(\"id\");",
+                  "  pm.expect(res.data).to.have.property(\"name\");",
+                  "  pm.expect(res.data).to.have.property(\"age\");",
+                  "  pm.expect(res.data).to.have.property(\"major\");",
+                  "});",
+                  "",
+                  "pm.test(\"major is one of allowed enum\", function () {",
+                  "  pm.expect([\"CS\", \"DSI\", \"IT\"]).to.include(res.data.major);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /students/:id (not found)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /students (success)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice Smith\",\n  \"age\": 20,\n  \"major\": \"CS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Created student has id\", function () {",
+                  "  pm.expect(res.data.id).to.be.a(\"number\");",
+                  "});",
+                  "",
+                  "pm.test(\"Created student fields are valid\", function () {",
+                  "  pm.expect(res.data.name).to.be.a(\"string\");",
+                  "  pm.expect(res.data.age).to.be.a(\"number\");",
+                  "  pm.expect([\"CS\", \"DSI\", \"IT\"]).to.include(res.data.major);",
+                  "});",
+                  "",
+                  "pm.environment.set(\"studentId\", res.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /students (validation error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"age\": 10,\n  \"major\": \"INVALID\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Validation response has message/error\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "  pm.expect(res).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /students/:id (success)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice Johnson\",\n  \"age\": 21,\n  \"major\": \"IT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students",
+                "{{studentId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Updated student fields exist\", function () {",
+                  "  pm.expect(res.data).to.have.property(\"id\");",
+                  "  pm.expect(res.data).to.have.property(\"name\");",
+                  "  pm.expect(res.data).to.have.property(\"age\");",
+                  "  pm.expect(res.data).to.have.property(\"major\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /students/:id (not found / validation error)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ghost\",\n  \"age\": 999,\n  \"major\": \"CS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 or 404\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /students/:id (success)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students",
+                "{{studentId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Delete success message exists\", function () {",
+                  "  pm.expect(res.message.toLowerCase()).to.include(\"deleted\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /students/:id (not found)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "students",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "GET /courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Data is array\", function () {",
+                  "  pm.expect(res.data).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /courses/:course_code (success)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseCode}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Course has required fields\", function () {",
+                  "  pm.expect(res.data).to.have.property(\"course_code\");",
+                  "  pm.expect(res.data).to.have.property(\"title\");",
+                  "  pm.expect(res.data).to.have.property(\"credits\");",
+                  "});",
+                  "",
+                  "pm.test(\"Credits in range 1-4\", function () {",
+                  "  pm.expect(res.data.credits).to.be.within(1, 4);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /courses/:course_code (not found)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/NOTEXIST",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "NOTEXIST"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /courses (success)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_code\": \"CS101\",\n  \"title\": \"Intro to Programming\",\n  \"credits\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Created course fields valid\", function () {",
+                  "  pm.expect(res.data.course_code).to.be.a(\"string\");",
+                  "  pm.expect(res.data.title).to.be.a(\"string\");",
+                  "  pm.expect(res.data.credits).to.be.within(1, 4);",
+                  "});",
+                  "",
+                  "pm.environment.set(\"courseCode\", res.data.course_code);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /courses (validation error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_code\": \"\",\n  \"title\": \"\",\n  \"credits\": 10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Validation response has message/error\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "  pm.expect(res).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /courses (conflict - duplicate course_code)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_code\": \"CS101\",\n  \"title\": \"Duplicate Course\",\n  \"credits\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Response has conflict message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "  pm.expect(res.message).to.equal(\"conflict\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error indicates duplicate course_code\", function () {",
+                  "  pm.expect(res).to.have.property(\"error\");",
+                  "  pm.expect(res.error.toLowerCase()).to.include(\"course_code\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /courses/:course_code (success)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Introduction to Programming (Updated)\",\n  \"credits\": 4\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseCode}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Updated course fields exist\", function () {",
+                  "  pm.expect(res.data).to.have.property(\"course_code\");",
+                  "  pm.expect(res.data).to.have.property(\"title\");",
+                  "  pm.expect(res.data).to.have.property(\"credits\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /courses/:course_code (not found / validation error)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ghost Course\",\n  \"credits\": 10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses/NOTEXIST",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "NOTEXIST"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 or 404\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /courses/:course_code (credit reduction blocked - has enrollments)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Data Analytics Foundation\",\n  \"credits\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseCode}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 when reducing credits with existing enrollments\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Message indicates business rule violation\", function () {",
+                  "  pm.expect(res.message).to.equal(\"business rule violation\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error message mentions cannot reduce credits\", function () {",
+                  "  pm.expect(res.error).to.include(\"cannot reduce credits\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /courses/:course_code (success)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseCode}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Delete success message exists\", function () {",
+                  "  pm.expect(res.message.toLowerCase()).to.include(\"deleted\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /courses/:course_code (not found)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/NOTEXIST",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "NOTEXIST"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "GET /enrollments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Data is array\", function () {",
+                  "  pm.expect(res.data).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /enrollments/:enroll_id (success)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/{{enrollId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "{{enrollId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Enrollment has required fields\", function () {",
+                  "  pm.expect(res.data).to.have.property(\"enroll_id\");",
+                  "  pm.expect(res.data).to.have.property(\"student_id\");",
+                  "  pm.expect(res.data).to.have.property(\"course_code\");",
+                  "  pm.expect(res.data).to.have.property(\"grade\");",
+                  "});",
+                  "",
+                  "pm.test(\"Grade is valid\", function () {",
+                  "  pm.expect([\"A\", \"B\", \"C\", \"D\", \"F\", \"W\"]).to.include(res.data.grade);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /enrollments/:enroll_id (not found)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /enrollments (success)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{studentId}},\n  \"course_code\": \"{{courseCode}}\",\n  \"grade\": \"A\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Created enrollment fields valid\", function () {",
+                  "  pm.expect(res.data.enroll_id).to.be.a(\"number\");",
+                  "  pm.expect(res.data.student_id).to.be.a(\"number\");",
+                  "  pm.expect(res.data.course_code).to.be.a(\"string\");",
+                  "  pm.expect([\"A\", \"B\", \"C\", \"D\", \"F\", \"W\"]).to.include(res.data.grade);",
+                  "});",
+                  "",
+                  "pm.environment.set(\"enrollId\", res.data.enroll_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /enrollments (validation / FK error)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": 999999,\n  \"course_code\": \"NOTEXIST\",\n  \"grade\": \"Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 or 404\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /enrollments (blocked - student already has 3 courses)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{studentId}},\n  \"course_code\": \"{{courseCode}}\",\n  \"grade\": \"B\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 when student already has 3 enrollments\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Message indicates business rule violation\", function () {",
+                  "  pm.expect(res.message).to.equal(\"business rule violation\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error message mentions maximum enrollment limit\", function () {",
+                  "  pm.expect(res.error).to.include(\"maximum is 3\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /enrollments/:enroll_id (success)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{studentId}},\n  \"course_code\": \"{{courseCode}}\",\n  \"grade\": \"B\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/{{enrollId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "{{enrollId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "",
+                  "pm.test(\"Updated enrollment fields exist\", function () {",
+                  "  pm.expect(res.data).to.have.property(\"enroll_id\");",
+                  "  pm.expect(res.data).to.have.property(\"student_id\");",
+                  "  pm.expect(res.data).to.have.property(\"course_code\");",
+                  "  pm.expect(res.data).to.have.property(\"grade\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /enrollments/:enroll_id (not found / validation error)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": 999999,\n  \"course_code\": \"NOTEXIST\",\n  \"grade\": \"Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 or 404\", function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([400, 404]);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /enrollments/:enroll_id (success)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/{{enrollId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "{{enrollId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Delete success message exists\", function () {",
+                  "  pm.expect(res.message.toLowerCase()).to.include(\"deleted\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /enrollments/:enroll_id (not found)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "const res = pm.response.json();",
+                  "pm.test(\"Has message\", function () {",
+                  "  pm.expect(res).to.have.property(\"message\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": []
+}
